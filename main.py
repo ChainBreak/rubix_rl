@@ -10,9 +10,9 @@ import click
 import torch
 from pathlib import Path
 import rubiks_cube as rc
+from omegaconf import OmegaConf
 
-
-
+import collect_states
 
 @click.group()
 @click.version_option(version='1.0.0')
@@ -23,11 +23,16 @@ def cli():
 @cli.command()
 @click.option('--config', help='Path to the config file')
 def train(config):
-    """Train a new DQN agent to solve Rubik's cubes."""
-    click.echo(f"Starting training with {config}...")
+    pass
     
+@cli.command()
+@click.option('--config', help='Path to the config file')
+def collect(config):
+    config = OmegaConf.load(config)
+    collect_states.collect_states(config.collect)
 
-
+def run_agent():
+    pass
 
 @cli.command()
 def play():

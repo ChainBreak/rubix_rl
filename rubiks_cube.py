@@ -8,7 +8,19 @@ class RubiksCube:
 
         self.action_space = list(self.cube._moves_notation.keys())
         self.action_space_size = len(self.action_space)
+        self.steps_taken = 0
 
+    def take_action(self, action: int):
+        operation = self.action_space[action]
+        self.cube.perform_operations([operation])
+        self.steps_taken += 1
+
+    def get_state_dict(self):
+        return {
+            "steps": self.steps_taken,
+            "state": self.cube.color_code
+        }
+    
     def get_state_as_tensor(self):
         return convert_color_code_to_tensor(self.cube.color_code)
 
