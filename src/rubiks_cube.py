@@ -1,11 +1,12 @@
 import torch
 import rubik_sim
 import textwrap
+from typing import Any
 
 class RubiksCube:
+    
     def __init__(self):
         self.cube: rubik_sim.RubiksCube = rubik_sim.RubiksCube()
-
         self.action_space = list(self.cube._moves_notation.keys())
         self.action_space_size = len(self.action_space)
         self.steps_taken = 0
@@ -13,13 +14,17 @@ class RubiksCube:
     def take_action(self, action: int):
         operation = self.action_space[action]
         self.cube.perform_operations([operation])
-        self.steps_taken += 1
+        
 
     def get_state_dict(self):
         return {
             "steps": self.steps_taken,
             "state": self.cube.color_code
         }
+
+    def load_state_dict(self,state_dict: dict[str, Any])->None:
+        self.cube = rubik_sim.RubiksCube.from_color_code(state_dict["state"])
+        self.steps_taken = state_dict["steps"]
     
     def get_state_as_tensor(self):
         return convert_color_code_to_tensor(self.cube.color_code)
@@ -42,6 +47,7 @@ class RubiksCube:
 
     def perform_operations(self, operations: list[str]):
         self.cube.perform_operations(operations)
+        self.steps_taken += 1
 
 
     def __str__(self):
