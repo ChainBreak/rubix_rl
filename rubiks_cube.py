@@ -24,8 +24,25 @@ class RubiksCube:
     def get_state_as_tensor(self):
         return convert_color_code_to_tensor(self.cube.color_code)
 
+
+    def get_all_next_states_as_tensor(self)->torch.Tensor:
+        next_states_color_codes = self.get_color_codes_of_all_next_states()
+        next_state_tensors = [convert_color_code_to_tensor(color_code) for color_code in next_states_color_codes]
+        return torch.stack(next_state_tensors)
+
+
+    def get_color_codes_of_all_next_states(self)->list[str]:
+        next_states_color_codes = []
+        for action in self.action_space:
+            next_cube = rubik_sim.RubiksCube.from_color_code(self.cube.color_code)
+            next_cube.perform_operations([action])
+            next_states_color_codes.append(next_cube.color_code)
+        return next_states_color_codes
+
+
     def perform_operations(self, operations: list[str]):
         self.cube.perform_operations(operations)
+
 
     def __str__(self):
         color_code = self.cube.color_code
