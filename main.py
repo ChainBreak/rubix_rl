@@ -9,10 +9,10 @@ It provides commands for training, evaluation, and testing the DQN agent.
 import click
 import torch
 from pathlib import Path
-import rubiks_cube as rc
+from src import rubiks_cube as rc
 from omegaconf import OmegaConf
 
-import collect_states
+from src import collect_states
 
 @click.group()
 @click.version_option(version='1.0.0')

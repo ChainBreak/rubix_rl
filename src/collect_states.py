@@ -1,6 +1,6 @@
-from recorder import Recorder
+from src.recorder import Recorder
 import random
-import rubiks_cube as rc
+from src import rubiks_cube as rc
 import numpy as np
 
 def collect_states(config):
