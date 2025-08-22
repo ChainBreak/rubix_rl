@@ -5,10 +5,12 @@ from torch.utils.data import Dataset
 from omegaconf import DictConfig
 from src import rubiks_cube as rc
 
-class RubikDataset(Dataset[dict[str, Any]]):
+class RubiksDataset(Dataset[dict[str, Any]]):
     
     def __init__(self, config: DictConfig) -> None:
-      self.cube_states: list[dict[str, Any]] = self.load_all_json_files(config.dataset_dir)
+        self.cube_states: list[dict[str, Any]] = self.load_all_json_files(
+            dataset_dir=Path(config.dataset_dir),
+        )
 
     def load_all_json_files(self, dataset_dir: Path)->list[dict[str, Any]]:
         cube_states = []
@@ -31,7 +33,7 @@ class RubikDataset(Dataset[dict[str, Any]]):
     def __getitem__(self, idx: int)->dict[str, Any]:
 
         cube_state = self.cube_states[idx]
-        
+
         cube = rc.RubiksCube()
         cube.load_state_dict(cube_state)
 
@@ -40,5 +42,6 @@ class RubikDataset(Dataset[dict[str, Any]]):
 
         return {
             "current_state": current_state,
-            "next_states": next_states
+            "next_states": next_states,
+            "max_steps_taken": cube.steps_taken,
         }

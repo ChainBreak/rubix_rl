@@ -13,6 +13,7 @@ from src import rubiks_cube as rc
 from omegaconf import OmegaConf
 
 from src import collect_states
+from src import trainer
 
 @click.group()
 @click.version_option(version='1.0.0')
@@ -23,8 +24,10 @@ def cli():
 @cli.command()
 @click.option('--config', help='Path to the config file')
 def train(config):
-    pass
-    
+    config = OmegaConf.load(config)
+    trainer.train(config)
+
+  
 @cli.command()
 @click.option('--config', help='Path to the config file')
 def collect(config):
