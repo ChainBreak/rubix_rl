@@ -8,7 +8,7 @@ class Recorder:
     def __init__(self, config): 
         self.dataset_dir = Path(config.dataset_dir)
         self.buffer = []
-        self.max_buffer_size = 1000
+        self.max_buffer_size = 10000
         
         self.exit_hooks_registered = False
 
