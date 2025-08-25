@@ -87,11 +87,9 @@ class LitModule(L.LightningModule):
 
         steps_to_go_logits = self.model_ema(next_states)
 
-        steps_to_go_probs = F.softmax(steps_to_go_logits, dim=1)
-
         # For each state, sample steps_to_go from the softmax distribution.
         # Ie the first class is 0 steps to go, the second class is 1 step to go, etc.
-        steps_to_go = torch.multinomial(steps_to_go_probs, num_samples=1).squeeze(-1)
+        steps_to_go = torch.argmax(steps_to_go_logits, dim=1)
 
         steps_to_go = steps_to_go.reshape(batch_size, num_next_states)
 
