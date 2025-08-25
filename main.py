@@ -14,6 +14,7 @@ from omegaconf import OmegaConf
 
 from src import collect_states
 from src import trainer
+from src import player as player_module
 
 @click.group()
 @click.version_option(version='1.0.0')
@@ -38,14 +39,23 @@ def run_agent():
     pass
 
 @cli.command()
-def play():
+@click.option('--checkpoint', help='Path to the checkpoint file')
+@click.option('--device', help='Device to use for the player')
+def play(checkpoint, device):
     cube = rc.RubiksCube()
+    player = player_module.Player(checkpoint, device)
     while True:
         print(cube)
-        print(cube.action_space)
-        print("Enter the operations to perform on the cube:")
+        print(" ".join(cube.action_space))
+        actions = player.get_actions([cube])
+        model_operation = cube.action_space[actions[0]]
+        print(f"Enter the operations to perform on the cube ({model_operation}):")
         operations = input()
-        operations = operations.split(" ")
+        print(operations)
+        if operations.strip() == "":
+            operations = [model_operation]
+        else:
+            operations = operations.split(" ")
         cube.perform_operations(operations)
 
 if __name__ == "__main__":
