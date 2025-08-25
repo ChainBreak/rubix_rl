@@ -10,6 +10,7 @@ import omegaconf
 import lightning as L
 from typing import override
 from src import rubiks_dataset
+from torch.optim import swa_utils
 
 
 class LitModule(L.LightningModule):
@@ -23,6 +24,11 @@ class LitModule(L.LightningModule):
         self.config = omegaconf.OmegaConf.create(config)
         
         self.model = self.create_model(self.config.model)
+        self.model_ema = swa_utils.AveragedModel(
+            self.model,
+            avg_fn=swa_utils.get_ema_avg_fn(0.999),
+            use_buffers=True,
+        )
 
     def create_model(self, config: omegaconf.DictConfig) -> nn.Module:
         """
@@ -50,6 +56,7 @@ class LitModule(L.LightningModule):
     
     @override
     def training_step(self, batch: dict[str, torch.Tensor], batch_idx: int) -> torch.Tensor:
+        self.model_ema.update_parameters(self.model)
 
         next_states = batch["next_states"].float()
         current_state = batch["current_state"].float()
@@ -78,7 +85,7 @@ class LitModule(L.LightningModule):
 
         next_states = next_states.reshape(batch_size * num_next_states, num_features)
 
-        steps_to_go_logits = self.model(next_states)
+        steps_to_go_logits = self.model_ema(next_states)
 
         steps_to_go_probs = F.softmax(steps_to_go_logits, dim=1)
 
