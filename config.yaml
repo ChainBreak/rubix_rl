@@ -2,18 +2,18 @@ dataset_dir: ./dataset
 
 collect:
   recorder: ${recorder}
-  num_samples: 1000000
+  num_samples: 100000
   max_scramble_steps: 40
 
 data:
   dataset_dir: ${dataset_dir}
   batch_size: 128
-  num_workers: 1
+  num_workers: 6
 
 train:
   max_epochs: 9999999
   accelerator: "mps"
-  learning_rate: 1e-4
+  learning_rate: 1e-3
 
 recorder:
   dataset_dir: ${dataset_dir}

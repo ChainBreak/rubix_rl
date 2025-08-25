@@ -53,7 +53,7 @@ class LitModule(L.LightningModule):
 
         next_states = batch["next_states"].float()
         current_state = batch["current_state"].float()
-        max_steps_taken = batch["max_steps_taken"].float()
+        max_steps_taken = batch["max_steps_taken"]
 
         # Get the minimum steps to go from the next states.
         with torch.no_grad():
@@ -61,15 +61,15 @@ class LitModule(L.LightningModule):
             steps_to_go_targets = torch.minimum(steps_to_go + 1, max_steps_taken)
 
         steps_to_go_logits = self.model(current_state)
-
-        steps_to_go_pred = torch.argmax(steps_to_go_logits, dim=1)
-
         loss = F.cross_entropy(steps_to_go_logits, steps_to_go_targets)
 
-        step_to_go_error = abs(steps_to_go_pred - steps_to_go_targets).mean()
 
+        steps_to_go_pred = torch.argmax(steps_to_go_logits, dim=1)
+        avg_steps_to_go_pred = steps_to_go_pred.float().mean()
+        step_to_go_error = abs(steps_to_go_pred - steps_to_go_targets).float().mean()
         self.log("train_loss", loss, prog_bar=True, on_step=True, on_epoch=True)
         self.log("train_step_to_go_error", step_to_go_error, prog_bar=True, on_step=True, on_epoch=True)
+        self.log("train_avg_steps_to_go_pred", avg_steps_to_go_pred, prog_bar=True, on_step=True, on_epoch=True)
 
         return loss
     

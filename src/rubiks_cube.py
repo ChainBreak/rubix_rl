@@ -13,7 +13,7 @@ class RubiksCube:
 
     def take_action(self, action: int):
         operation = self.action_space[action]
-        self.cube.perform_operations([operation])
+        self.perform_operations([operation])
         
 
     def get_state_dict(self):
