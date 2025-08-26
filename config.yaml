@@ -2,13 +2,13 @@ dataset_dir: ./dataset
 
 collect:
   recorder: ${recorder}
-  num_samples: 100000
-  max_scramble_steps: 40
+  num_samples: 1_000_000
+  max_scramble_steps: 17
 
 data:
   dataset_dir: ${dataset_dir}
   batch_size: 128
-  num_workers: 6
+  num_workers: 16
 
 train:
   max_epochs: 9999999
@@ -17,9 +17,10 @@ train:
 
 recorder:
   dataset_dir: ${dataset_dir}
+  items_per_file: 10000
 
 model:
   input_size: 324
   hidden_size: 1024
-  num_blocks: 10
+  num_blocks: 5
   output_size: 100

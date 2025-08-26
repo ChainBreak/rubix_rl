@@ -9,3 +9,4 @@ click
 rubik-sim
 omegaconf
 lightning
+pydantic

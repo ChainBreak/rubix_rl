@@ -1,29 +1,44 @@
-from src.recorder import Recorder
+from src.recorder import Recorder, RecorderConfig
 import random
 from src import rubiks_cube as rc
 import numpy as np
+from pydantic import BaseModel
 
-def collect_states(config):
+class CollectConfig(BaseModel):
+    num_samples: int
+    max_scramble_steps: int
+    recorder: RecorderConfig
+
+def collect_states(config: CollectConfig):
+    num_samples = config.num_samples
+    record_number_of_cube_states(config, num_samples)
+
+def record_number_of_cube_states(config:CollectConfig, num_samples:int):
     recorder = Recorder(config.recorder)
+    cube_generator = generate_random_cubes(config)
+    for _ in range(num_samples):
+        cube = next(cube_generator)
+        recorder.record(cube.get_state_dict())
 
-    for _ in range(config.num_samples):
-        randomly_scramble_cube_and_record_states(recorder, config.max_scramble_steps)   
+def generate_random_cubes(config:CollectConfig):
+    while True:
+        yield from scramble_cube(config)
 
-def randomly_scramble_cube_and_record_states(recorder:Recorder, max_scramble_steps:int):
+
+def scramble_cube(config:CollectConfig):
     cube = rc.RubiksCube()
-    for i in range(max_scramble_steps+1):
+    for i in range(config.max_scramble_steps+1):
 
-        save_probability = calculate_save_probability(i, max_scramble_steps)
+        save_probability = calculate_save_probability(i, config.max_scramble_steps)
         
         if random.random() < save_probability:
-            recorder.record(cube.get_state_dict())
+            yield cube
 
         cube.take_action(random.randint(0, cube.action_space_size - 1))
 
 def calculate_save_probability(scramble_step: int, max_scramble_steps: int) -> float:
 
-    # Define interpolation points: x=[0, max_steps], y=[0.1, 1.0]
-    x_points = [0, max_scramble_steps]
-    y_points = [0.1, 1.0]
-    
-    return float(np.interp(scramble_step, x_points, y_points))
+    if scramble_step == 0:
+        return 0.1
+    else:
+        return 1.0

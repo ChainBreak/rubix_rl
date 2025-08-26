@@ -2,13 +2,18 @@ import json
 import atexit
 from pathlib import Path
 from datetime import datetime
+from pydantic import BaseModel
+
+class RecorderConfig(BaseModel):
+    dataset_dir: str
+    items_per_file: int
 
 
 class Recorder:
-    def __init__(self, config): 
-        self.dataset_dir = Path(config.dataset_dir)
+    def __init__(self, config: RecorderConfig): 
+        self.dataset_dir: Path = Path(config.dataset_dir)
         self.buffer = []
-        self.max_buffer_size = 10000
+        self.items_per_file: int = config.items_per_file
         
         self.exit_hooks_registered = False
 
@@ -20,7 +25,7 @@ class Recorder:
 
         self.buffer.append(item)
         
-        if len(self.buffer) >= self.max_buffer_size:
+        if len(self.buffer) >= self.items_per_file:
             self.save()
             self.buffer = []
 
