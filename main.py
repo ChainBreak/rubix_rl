@@ -24,9 +24,10 @@ def cli():
 
 @cli.command()
 @click.option('--config', help='Path to the config file')
-def train(config):
+@click.option('--checkpoint', help='Path to the checkpoint file')
+def train(config, checkpoint):
     config = OmegaConf.load(config)
-    trainer.train(config)
+    trainer.train(config, checkpoint)
 
   
 @cli.command()
@@ -48,14 +49,20 @@ def play(checkpoint, device):
         print(cube)
         print(" ".join(cube.action_space))
         actions = player.get_actions([cube])
+        steps_to_go = player.get_steps_to_go([cube])[0]
         model_operation = cube.action_space[actions[0]]
-        print(f"Enter the operations to perform on the cube ({model_operation}):")
-        operations = input()
-        print(operations)
-        if operations.strip() == "":
+        print(f"Enter the operations to perform on the cube ({model_operation}, {steps_to_go}):")
+        input_str = input()
+
+        if input_str.strip().lower() == "z":
+            cube = rc.RubiksCube()
+            continue
+
+        if input_str.strip() == "":
             operations = [model_operation]
         else:
-            operations = operations.split(" ")
+            operations = input_str.split(" ")
+
         cube.perform_operations(operations)
 
 if __name__ == "__main__":

@@ -9,6 +9,17 @@ class Player:
         self.device = torch.device(device)
         self.model.to(self.device)
 
+    def get_steps_to_go(self, cubes: list[RubiksCube]) -> list[int]:
+        list_of_states = [cube.get_state_as_tensor() for cube in cubes]
+
+        states = torch.stack(list_of_states).float().to(self.device)
+
+        steps_to_go_logits = self.model(states)
+
+        steps_to_go = torch.argmax(steps_to_go_logits, dim=1)
+
+        return steps_to_go.tolist()
+
     def get_actions(self, cubes: list[RubiksCube]) -> list[str]:
         
         list_of_next_states = [cube.get_all_next_states_as_tensor() for cube in cubes]
