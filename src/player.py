@@ -8,6 +8,7 @@ class Player:
         self.model = LitModule.load_from_checkpoint(checkpoint)
         self.device = torch.device(device)
         self.model.to(self.device)
+        self.model.eval()
 
     def get_steps_to_go(self, cubes: list[RubiksCube]) -> list[int]:
         list_of_states = [cube.get_state_as_tensor() for cube in cubes]

@@ -85,7 +85,7 @@ class LitModule(L.LightningModule):
 
         next_states = next_states.reshape(batch_size * num_next_states, num_features)
 
-        steps_to_go_logits = self.model_ema(next_states)
+        steps_to_go_logits = self.model(next_states)
 
         # For each state, sample steps_to_go from the softmax distribution.
         # Ie the first class is 0 steps to go, the second class is 1 step to go, etc.
@@ -99,7 +99,6 @@ class LitModule(L.LightningModule):
         return steps_to_go
 
 
-    
     @override
     def configure_optimizers(self) -> torch.optim.Optimizer:
         optimizer = Adam(self.parameters(), lr=self.config.train.learning_rate)
