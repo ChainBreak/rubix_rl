@@ -13,6 +13,7 @@ from src import rubiks_cube as rc
 from omegaconf import OmegaConf
 
 from src import collect_states
+from src import collect_random_states
 from src import trainer
 from src import player as player_module
 
@@ -32,9 +33,14 @@ def train(config, checkpoint):
   
 @cli.command()
 @click.option('--config', help='Path to the config file')
-def collect(config):
+@click.option("--checkpoint", help='Path to the checkpoint file')
+@click.option("--device", help='Device to use for the player')
+def collect(config, checkpoint=None, device:str="mps"):
     config = OmegaConf.load(config)
-    collect_states.collect_states(config.collect)
+    if checkpoint:
+        collect_states.collect_states(config.collect, checkpoint, device)
+    else:
+        collect_random_states.collect_random_states(config.collect)
 
 def run_agent():
     pass
@@ -48,7 +54,7 @@ def play(checkpoint, device):
     while True:
         print(cube)
         print(" ".join(cube.action_space))
-        actions = player.get_actions([cube])
+        actions,_ = player.get_actions([cube])
         steps_to_go = player.get_steps_to_go([cube])[0]
         model_operation = cube.action_space[actions[0]]
         print(f"Enter the operations to perform on the cube ({model_operation}, {steps_to_go}):")

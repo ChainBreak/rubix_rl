@@ -10,7 +10,7 @@ class Player:
         self.model.to(self.device)
         self.model.eval()
 
-    def get_steps_to_go(self, cubes: list[RubiksCube]) -> list[int]:
+    def get_steps_to_go(self, cubes: list[RubiksCube]) -> torch.Tensor:
         list_of_states = [cube.get_state_as_tensor() for cube in cubes]
 
         states = torch.stack(list_of_states).float().to(self.device)
@@ -19,9 +19,9 @@ class Player:
 
         steps_to_go = torch.argmax(steps_to_go_logits, dim=1)
 
-        return steps_to_go.tolist()
+        return steps_to_go.cpu()
 
-    def get_actions(self, cubes: list[RubiksCube]) -> list[str]:
+    def get_actions(self, cubes: list[RubiksCube]) -> tuple[torch.Tensor, torch.Tensor]:
         
         list_of_next_states = [cube.get_all_next_states_as_tensor() for cube in cubes]
 
@@ -32,11 +32,8 @@ class Player:
         steps_to_go_probs = F.softmax(steps_to_go_logits, dim=1)
 
         steps_to_go = torch.multinomial(steps_to_go_probs, num_samples=1).squeeze(-1)
-
-        # steps_to_go = torch.argmax(steps_to_go_logits, dim=1)
         
         steps_to_go = steps_to_go.reshape(len(cubes), -1)
+        next_steps_to_go, actions = torch.min(steps_to_go, dim=1)
 
-        actions = steps_to_go.argmin(dim=1)
-
-        return actions.tolist()
+        return actions.cpu(),  next_steps_to_go.cpu()

@@ -49,6 +49,9 @@ class RubiksCube:
         self.cube.perform_operations(operations)
         self.steps_taken += 1
 
+        if self.cube.is_solved():
+            self.steps_taken = 0
+
 
     def __str__(self):
         color_code = self.cube.color_code
