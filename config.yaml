@@ -13,7 +13,7 @@ data:
 train:
   max_epochs: 9999999
   accelerator: "mps"
-  learning_rate: 1e-2
+  learning_rate: 1e-3
 
 recorder:
   dataset_dir: ${dataset_dir}
@@ -22,5 +22,5 @@ recorder:
 model:
   input_size: 324
   hidden_size: 1024
-  num_blocks: 5
+  num_blocks: 10
   output_size: 100
